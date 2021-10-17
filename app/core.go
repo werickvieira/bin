@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/hex"
 	"io"
 	"io/ioutil"
 	"os"
@@ -93,13 +94,21 @@ func EncryptFile(filename string, passphrase string) error {
 
 	defer f.Close()
 
-	_, _ = f.Write(values)
+	str := hex.EncodeToString(values)
+	_, _ = f.WriteString(str)
 	return nil
 }
 
 func DecryptFile(filename string, passphrase string) error {
 	var err error
 	data, err := ioutil.ReadFile(filename + ".d")
+	if err != nil {
+		return err
+	}
+
+	// It was necessary makes convert data to string to use clean decode.
+	str := string(data)
+	data, err = hex.DecodeString(str)
 	if err != nil {
 		return err
 	}

@@ -5,22 +5,21 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"crypto/sha256"
-	"encoding/hex"
 	"io"
 	"io/ioutil"
 	"os"
 )
 
-func createHash(key string) string {
+func createHash(key string) []byte {
 	hasher := sha256.New()
 	hasher.Write([]byte(key))
-	return hex.EncodeToString(hasher.Sum(nil))
+	return hasher.Sum(nil)
 }
 
 func encrypt(data []byte, passphrase string) ([]byte, error) {
 	var err error
 
-	key, err := hex.DecodeString(createHash(passphrase))
+	key := createHash(passphrase)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +45,7 @@ func encrypt(data []byte, passphrase string) ([]byte, error) {
 
 func decrypt(data []byte, passphrase string) ([]byte, error) {
 	var err error
-	key, err := hex.DecodeString(createHash(passphrase))
+	key := createHash(passphrase)
 	if err != nil {
 		return nil, err
 	}
